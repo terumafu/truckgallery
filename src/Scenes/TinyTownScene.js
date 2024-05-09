@@ -39,11 +39,13 @@ class Gallerygame extends Phaser.Scene {
 
         this.score = 0;
         this.text = "";
+        this.wavetext = "";
 
         this.health = 3;
         this.iframe = 0;
         this.hearts = [];
         this.highscore = 0;
+        this.wintext = "";
         
     }
 
@@ -156,6 +158,7 @@ class Gallerygame extends Phaser.Scene {
                 hearts.visible = false;
                 
             }
+            this.wintext.visible = false;
             this.hearts = [];
             this.health = 3;
             for(let i = 0; i < this.health;i++){
@@ -164,6 +167,7 @@ class Gallerygame extends Phaser.Scene {
             this.gameovertext.visible = false;
             this.score = 0;
             this.text.setText("Score: "+ this.score);
+            this.wavetext.setText("Wave " + this.wave);
         });
         for(let i = 0; i < this.enemyspawns[this.wave]; i++){
             this.enemies.push({sprite:{}, health:this.wave * 100 + 100,slowed: false,hit: false});
@@ -180,12 +184,17 @@ class Gallerygame extends Phaser.Scene {
 
         
         this.text = this.add.text(0, 0, 'Score: '+ this.score, { font: '40px "Press Start 2P"' });
+        this.wavetext = this.add.text(0, 40, 'Wave: '+ (this.wave + 1), { font: '40px "Press Start 2P"' });
+
         this.gameovertext = this.add.text(250,200, 'Game Over, Press P to Restart', { font: '40px "Press Start 2P"' });
         this.highscoretext = this.add.text(650, 0, 'High Score: '+ localStorage.getItem("highscore"), { font: '40px "Press Start 2P"' });
         this.gameovertext.visible = false;
         for(let i = 0; i < this.health;i++){
             this.hearts.push(this.add.sprite(875 - i * 40, 200, "spritesheet", "ambulance.png"));
         }
+
+        this.wintext = this.add.text(400,400, 'YOU WIN\npress P to play again', { font: '40px "Press Start 2P"' });
+        this.wintext.visible = false;
     }
     checkcollision(){
         
@@ -263,9 +272,12 @@ class Gallerygame extends Phaser.Scene {
         
     } 
     randmove(){
-        
+        let tries = 10;
         let randnum = Math.floor(Math.random() * (this.currenemy));
-        while((this.enemies[randnum].sprite.visible == false && this.enemies[randnum].sprite.x > 500) && this.enemiesonscreen == true ){
+        while((this.enemies[randnum].sprite.visible == false || this.enemies[randnum].sprite.x > 500) && this.enemiesonscreen == true ){
+            if(tries >= 10 && this.enemies[randnum].sprite.x > 500){
+                return;
+            }
             randnum = Math.floor(Math.random() * (this.currenemy));
         }
         this.enemytemp = this.enemies[randnum];
@@ -354,6 +366,7 @@ class Gallerygame extends Phaser.Scene {
         this.checkenemyplayercoll();
         if(this.wave == 3){
             //print good job game over
+            this.wintext.visible = true;
             this.gameover = true;
         }
         
@@ -391,12 +404,13 @@ class Gallerygame extends Phaser.Scene {
                     this.enemytemp.sprite.visible = false;
                     this.enemytemp.sprite.destroy(true);
                     let tempnum = enemy2.health/100 - 1;
-                    if(tempnum > 2){
-                        tempnum = 2;
-                    }
                     if(tempnum < 0){
                         tempnum = 0;
                     }
+                    if(tempnum > 2){
+                        tempnum = 2;
+                    }
+                    tempnum = Math.floor(tempnum);
                     enemy2.sprite.visible = false;
                     enemy2.sprite.destroy(true);
                     let newsprite = this.add.sprite(enemy2.sprite.x,enemy2.sprite.y,"spritesheet",this.vehiclelist[tempnum]);
@@ -417,6 +431,7 @@ class Gallerygame extends Phaser.Scene {
             
             //("wave " + this.wave);
             this.wave++;
+            this.wavetext.setText("Wave " + (this.wave +1));
             this.currenemy = 0;
             this.enemies = [];
             //("wave " + this.wave);
