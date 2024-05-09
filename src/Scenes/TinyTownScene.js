@@ -1,6 +1,6 @@
-class TinyTown extends Phaser.Scene {
+class Gallerygame extends Phaser.Scene {
     constructor() {
-        super("tinyTown");
+        super("gallerygame");
         this.my = {sprite:{}};
         this.yslots = [326,413,500,590];
         this.bodyX = 800;
@@ -43,6 +43,8 @@ class TinyTown extends Phaser.Scene {
         this.health = 3;
         this.iframe = 0;
         this.hearts = [];
+        this.highscore = 0;
+        
     }
 
     preload() {
@@ -92,7 +94,7 @@ class TinyTown extends Phaser.Scene {
 
         my.sprite.body.setScale(2.5);
         my.sprite.body.flipX = true;
-        
+
         for(let type of this.bullettypes ){
             let newsprite = this.add.sprite(535,100,"spritesheet",type);
             newsprite.setScale(2.5);
@@ -122,6 +124,15 @@ class TinyTown extends Phaser.Scene {
         });
         this.input.keyboard.on('keydown-P', (event) => {
             this.gameover = false;
+            
+            
+
+            if(this.score > this.highscore){
+                this.highscore = this.score;
+                this.highscoretext.setText("High Score: " + this.score);
+            }
+            
+            
             for(let enemy of this.enemies){
                 enemy.sprite.visible = false;
                 enemy.sprite.destroy(true);
@@ -151,6 +162,8 @@ class TinyTown extends Phaser.Scene {
                 this.hearts.push(this.add.sprite(875 - i * 40, 200, "spritesheet", "ambulance.png"));
             }
             this.gameovertext.visible = false;
+            this.score = 0;
+            this.text.setText("Score: "+ this.score);
         });
         for(let i = 0; i < this.enemyspawns[this.wave]; i++){
             this.enemies.push({sprite:{}, health:this.wave * 100 + 100,slowed: false,hit: false});
@@ -167,7 +180,8 @@ class TinyTown extends Phaser.Scene {
 
         
         this.text = this.add.text(0, 0, 'Score: '+ this.score, { font: '40px "Press Start 2P"' });
-        this.gameovertext = this.add.text(250,200, 'Game Over, Press P to Restart', { font: '40px "Press Start 2P"' })
+        this.gameovertext = this.add.text(250,200, 'Game Over, Press P to Restart', { font: '40px "Press Start 2P"' });
+        this.highscoretext = this.add.text(700, 0, 'High Score: '+ localStorage.getItem("highscore"), { font: '40px "Press Start 2P"' });
         this.gameovertext.visible = false;
         for(let i = 0; i < this.health;i++){
             this.hearts.push(this.add.sprite(875 - i * 40, 200, "spritesheet", "ambulance.png"));
@@ -185,6 +199,33 @@ class TinyTown extends Phaser.Scene {
                         this.score += 50;
                         this.text.setText("Score: " + this.score);
                     }else if(bullet.type == 0){
+                        if(enemy.health > 150 && enemy.health < 250){
+                            enemy.health -= 100;
+                        this.score += 100;
+                            let temp = this.add.sprite(enemy.sprite.x,enemy.sprite.y,"spritesheet","convertible.png");
+                            temp.setScale(2.5);
+                            this.enemies.push({sprite:temp, health:100,slowed: true,hit: false});
+                            console.log("yes");
+                            bullet.sprite.visible = false;
+                            bullet.sprite.destroy(true);
+                            this.bullet.splice(this.bullet.indexOf(bullet),1);
+                            let tempnum = enemy.health/100 - 1;
+                    if(tempnum > 2){
+                        tempnum = 2;
+                    }
+                    if(tempnum < 0){
+                        tempnum = 0;
+                    }
+
+                    tempnum = Math.abs(Math.ceil(tempnum));
+                    
+                    let newsprite = this.add.sprite(enemy.sprite.x,enemy.sprite.y,"spritesheet",this.vehiclelist[tempnum]);
+                    newsprite.setScale(2.5);
+                    enemy.sprite = newsprite;
+                    //this.enemies.splice(this.enemies.indexOf(enemy),1);
+                    this.sound.play();
+                            break;
+                        }
                         enemy.health -= 100;
                         this.score += 100;
                         this.text.setText("Score: " + this.score);
@@ -258,6 +299,7 @@ class TinyTown extends Phaser.Scene {
 
         
     }
+    
     checkhealth(){
         for(let enemy of this.enemies){
             if(enemy.health <= 0 && enemy.sprite.visible == true){
@@ -365,7 +407,7 @@ class TinyTown extends Phaser.Scene {
             }
         }
     }
-    ("enemymoving");
+    //("enemymoving");
         this.checkhealth();
         //(Phaser.Physics.Arcade);
         this.checkcollision();
@@ -373,16 +415,16 @@ class TinyTown extends Phaser.Scene {
         this.enemyspawner++;
         }else if(!this.enemiesonscreen){
             
-            ("wave " + this.wave);
+            //("wave " + this.wave);
             this.wave++;
             this.currenemy = 0;
             this.enemies = [];
-            ("wave " + this.wave);
+            //("wave " + this.wave);
             for(let i = 0; i < this.enemyspawns[this.wave]; i++){
                 this.enemies.push({sprite:{}, health: Math.floor(Math.random() * (this.wave + 1)) * 100 + 100,slowed: false,hit: false});
             }
-            ("wave " + this.wave);
-            for(let i = 0; i < this.enemyspawns[this.wave]; i++){
+            //("wave " + this.wave);
+            for(let i = 0; i < this.enemies.length; i++){
                 let randnum = Math.floor(Math.random() * 4);
                 let tempnum = this.enemies[i].health/100 - 1;
                 if(tempnum > 2){
@@ -394,7 +436,7 @@ class TinyTown extends Phaser.Scene {
                 newsprite.setScale(2.5);
                 this.enemies[i].sprite = newsprite;
             }
-            ("wave " + this.wave);
+            //("wave " + this.wave);
         }
         
         if(this.enemyspawner >= 40 + this.wave * 10 && this.currenemy < this.enemyspawns[this.wave]){
@@ -404,7 +446,7 @@ class TinyTown extends Phaser.Scene {
             this.currenemy++;
             
         }
-        ("enemy spawn");
+        //("enemy spawn");
         this.enemiesonscreen = false;
         for(let enemy of this.enemies){
             if(enemy.sprite.visible == true && enemy.sprite.x <= 1000){
@@ -432,7 +474,7 @@ class TinyTown extends Phaser.Scene {
                 this.enemiesonscreen = true;
             }
         }
-        ("enemyspeed and loop");
+        //("enemyspeed and loop");
         //("updating");
 
         for(let i = 0; i < 3; i++){
@@ -442,7 +484,7 @@ class TinyTown extends Phaser.Scene {
             else{
                 this.bulletdisplay[i].visible = false;
             }
-        }
+        }//
         if(this.timer < 100){
         this.timer++;
         }
@@ -463,7 +505,7 @@ class TinyTown extends Phaser.Scene {
             }
         }
         //292
-        ("bullet");
+        //("bullet");
         if(this.moving == true){
             for(let prop in my.sprite){
                 my.sprite[prop].y += this.direction * 5;
@@ -474,7 +516,7 @@ class TinyTown extends Phaser.Scene {
 
         }
         //(this.yslots[this.movingto]);
-        ("moving");
+        //("moving");
         if(this.spacekey.isDown && this.timer >= 40  && !this.moving){
             my.sprite.throw.visible = true;
             my.sprite.body.visible = false;
@@ -488,7 +530,7 @@ class TinyTown extends Phaser.Scene {
             my.sprite.body.visible = true;
             my.sprite.throw.visible = false;
         }
-        ("shoot");
+        //("shoot");
     }
 }
     
