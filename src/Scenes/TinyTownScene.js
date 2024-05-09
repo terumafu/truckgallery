@@ -204,8 +204,8 @@ class Gallerygame extends Phaser.Scene {
                     enemy.sprite.visible = false;
                     enemy.sprite.destroy(true);
                     if(bullet.type == 2){
-                        enemy.health -= 50;
-                        this.score += 5;
+                        enemy.health -= 40;
+                        this.score += 4;
                         this.text.setText("Score: " + this.score);
                     }else if(bullet.type == 0){
                         if(enemy.health > 150 && enemy.health < 250){
