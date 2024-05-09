@@ -21,7 +21,7 @@ let config = {
     },
     width: 960,         // 10 tiles, each 16 pixels, scaled 4x
     height: 640,
-    scene: [TinyTown],
+    scene: [Gallerygame],
     fps: { forceSetTimeOut: true, target: 60 }
 }
 
