@@ -181,7 +181,7 @@ class Gallerygame extends Phaser.Scene {
         
         this.text = this.add.text(0, 0, 'Score: '+ this.score, { font: '40px "Press Start 2P"' });
         this.gameovertext = this.add.text(250,200, 'Game Over, Press P to Restart', { font: '40px "Press Start 2P"' });
-        this.highscoretext = this.add.text(700, 0, 'High Score: '+ localStorage.getItem("highscore"), { font: '40px "Press Start 2P"' });
+        this.highscoretext = this.add.text(650, 0, 'High Score: '+ localStorage.getItem("highscore"), { font: '40px "Press Start 2P"' });
         this.gameovertext.visible = false;
         for(let i = 0; i < this.health;i++){
             this.hearts.push(this.add.sprite(875 - i * 40, 200, "spritesheet", "ambulance.png"));
@@ -196,12 +196,12 @@ class Gallerygame extends Phaser.Scene {
                     enemy.sprite.destroy(true);
                     if(bullet.type == 2){
                         enemy.health -= 50;
-                        this.score += 50;
+                        this.score += 5;
                         this.text.setText("Score: " + this.score);
                     }else if(bullet.type == 0){
                         if(enemy.health > 150 && enemy.health < 250){
                             enemy.health -= 100;
-                        this.score += 100;
+                        this.score += 10;
                             let temp = this.add.sprite(enemy.sprite.x,enemy.sprite.y,"spritesheet","convertible.png");
                             temp.setScale(2.5);
                             this.enemies.push({sprite:temp, health:100,slowed: true,hit: false});
@@ -227,7 +227,7 @@ class Gallerygame extends Phaser.Scene {
                             break;
                         }
                         enemy.health -= 100;
-                        this.score += 100;
+                        this.score += 10;
                         this.text.setText("Score: " + this.score);
                         bullet.sprite.visible = false;
                         bullet.sprite.destroy(true);
@@ -305,7 +305,7 @@ class Gallerygame extends Phaser.Scene {
             if(enemy.health <= 0 && enemy.sprite.visible == true){
                 enemy.sprite.visible = false;
                 enemy.sprite.destroy(true);
-                this.score += 50;
+                this.score += 5;
                 this.text.setText("Score: " + this.score);
             }
         }
