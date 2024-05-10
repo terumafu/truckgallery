@@ -272,12 +272,14 @@ class Gallerygame extends Phaser.Scene {
         
     } 
     randmove(){
-        let tries = 10;
+        let tries = 0;
         let randnum = Math.floor(Math.random() * (this.currenemy));
         while((this.enemies[randnum].sprite.visible == false || this.enemies[randnum].sprite.x > 500) && this.enemiesonscreen == true ){
             if(tries >= 10 && this.enemies[randnum].sprite.x > 500){
-                return;
+                tries = 0;
+                break;
             }
+            tries++;
             randnum = Math.floor(Math.random() * (this.currenemy));
         }
         this.enemytemp = this.enemies[randnum];
